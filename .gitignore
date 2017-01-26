@@ -1,0 +1,5 @@
+*.pyc
+manage.py
+project0/
+static/admin/
+worktime/migrations/
