@@ -1,0 +1,58 @@
+{% load bootstrap3 %}
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html>
+	<head>
+		{% block meta %}{% endblock %}
+		<title>{% block title %}{% endblock %}</title>
+		{% bootstrap_css %}
+		{% bootstrap_javascript %}
+		{{ form.media }}
+		<link rel='stylesheet' href="{% static 'worktime/css/style.css' %}">
+	</head>
+
+	<body>
+		<nav class='navbar navbar-static-top'>
+			<div class='container-fluid'>
+				<div class='navbar-header'>
+				    <a class='navbar-brand'>Worktime</a>
+				</div>
+				{% if user.is_authenticated %}
+				<div class='navbar-right' style='margin-right:10px'>
+				    <p class='navbar-text'>{{ user.first_name }} {{ user.last_name }}</p>
+				    <a href='{% url 'logout_then_login' %}' class='btn btn-default navbar-btn'>
+					<span class='glyphicon glyphicon-log-out'></span> Выйти
+				    </a>
+				</div>
+				{% else %}
+				{% if error %}<p class='navbar-text'>Error!!!</p>{% endif %}
+				    <form action='{% url 'login' %}' method='post' class='navbar-form navbar-right'>
+					{% csrf_token %}
+					<div class='form-group'>
+					    <input type='text' class='form-control' placeholder='Пользователь' name='username'>
+					    <input type='password' class='form-control' placeholder='Пароль' name='password'>
+					</div>
+					<button type='submit' class='btn btn-default'>
+					    <span class='glyphicon glyphicon-log-in'></span>  Войти
+					</button>
+				    </form>
+				{% endif %}
+			</div>
+		</nav>
+
+		<div class='container-fluid'>
+			<div class='row'>
+			    {% block menu %}
+				{% include 'worktime/menu.html' %}
+			    {% endblock %}
+
+			    <div class='col-md-10 col-md-offset-2 content'>
+				{% block content %}{% endblock %}
+			    </div>
+			</div>
+		</div>
+	<script src='{% static 'worktime/js/jquery.tablesorter.min.js' %}'></script>
+	<script src='{% static 'worktime/js/script.js' %}'></script>
+	</body>
+</html>

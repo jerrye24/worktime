@@ -1,0 +1,34 @@
+{% block menu %}
+
+{% now "Y" as current_year %}
+{% now "m" as current_month %}
+{% now "d" as current_day %}
+
+{% if user.is_authenticated %}
+    <div class='col-md-2 sidebar'>
+    <ul class='nav nav-sidebar'>
+    <li><a href='{% url 'index' %}'><span class='glyphicon glyphicon-home'></span>  Начальная страница</a></li>
+    <li><a href='{% url 'tabel' year=current_year month=current_month day=current_day %}'>
+	    <span class='glyphicon glyphicon-calendar'></span>  Табель за сегодня
+	</a>
+    </li>
+    <li><a href='{% url 'tabel_period_form' %}'>
+	    <span class='glyphicon glyphicon-calendar'></span>  Табель за период
+	</a>
+    </li>
+    <li><a href='{% url 'employee' %}'>
+	    <span class='glyphicon glyphicon-user'></span>  Сотрудники
+	</a>
+    </li>
+    <li><a href='{% url 'employee_create' %}'>
+	    <span class='glyphicon glyphicon-plus'></span>  Добавить сотрудника
+	</a>
+    </li>
+    {% if user.is_staff %}
+	<li><a href='{% url 'admin:index' %}'><span class='glyphicon glyphicon-dashboard'></span>  Администрирование</a></li>
+    {% endif %}
+    </ul>
+    </div>
+{% endif %}
+
+{% endblock %}

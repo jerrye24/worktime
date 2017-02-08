@@ -1,0 +1,29 @@
+{% extends 'worktime/base.html' %}
+
+{% block title %}Табель за период{% endblock %}
+
+{% block content %}
+    
+    <h3>Табель сотрудника: <span class='text-primary'>{{ employee }}</span> с {{ start|date:'j b Y' }} по {{ end|date:'j b Y' }}</h3>
+    <table class='table table-striped'>
+	<thead>
+	    <tr>
+		<th>Дата</th>
+		<th>Начало смены</th>
+		<th>Конец смены</th>
+		<th>Длительность смены</th>
+	    </tr>
+	</thead>
+	<tbody>
+	    {% for tabel in tabel_period %}
+	    <tr>
+		<td>{{ tabel.start_work|date:'j F Y(D)' }}</td>
+		<td>{{ tabel.start_work|time:'H:i' }}</td>
+		<td>{% if tabel.end_work %}{{ tabel.end_work|time:'H:i' }}{% endif %}</td>
+		<td>{% if tabel.time_at_work %}{{ tabel.time_at_work }}{% endif %}</td>
+	    </tr>
+	    {% endfor %}
+	</tbody>
+    </table>
+
+{% endblock %}

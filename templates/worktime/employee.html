@@ -1,0 +1,41 @@
+{% extends 'worktime/base.html' %}
+
+{% block title %}Сотрудники{% endblock %}
+
+{% block content %}
+
+<table class='table table-striped'>
+<thead>
+	<tr>
+		<th></th>
+		<th>Фамилия</th>
+		<th>Имя</th>
+		<th>Должность</th>
+		<th>Компания</th>
+		<th>Начало смены</th>
+		<th>Конец смены</th>
+		<th>Карта сотрудника</th>
+		<th></th>
+		<th></th>
+	</tr>
+</thead>
+
+<tbody>
+{% for employee in employee_table %}
+	<tr>
+		<td>{{ forloop.counter }}
+		<td>{{ employee.lastname }}</td>
+		<td>{{ employee.firstname }}</td>
+		<td>{{ employee.post }}</td>
+		<td>{{ employee.company}}</td>
+		<td>{{ employee.start_work }}</td>
+		<td>{{ employee.end_work }}</td>
+		<td>{{ employee.card }}</td>
+		<td><a href='{% url 'employee_update' employee.id%}'>Ред</a></td>
+		<td><a href='{% url 'employee_delete' employee.id%}' class='text-danger'>Удалить</a></td>
+	</tr>
+{% endfor %}
+</tbody>
+</table>
+
+{% endblock %}

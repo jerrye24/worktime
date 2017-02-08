@@ -1,3 +1,6 @@
 from django.contrib import admin
+from worktime.models import Employee, Tabel
 
-# Register your models here.
+admin.site.register(Employee)
+admin.site.register(Tabel)
+
