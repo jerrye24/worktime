@@ -7,10 +7,19 @@ from django.utils.encoding import python_2_unicode_compatible
 
 @python_2_unicode_compatible
 class Employee(models.Model):
-    company = models.CharField(default='Галс', max_length=10, verbose_name='Компания')
+    
+    COMPANY = [
+	['Галс', 'Галс'],
+	['Водомат', 'Водомат'],
+	['Водомат-сервис', 'Водомат-сервис'],
+	['ХАВ', 'ХАВ'],
+	['Визит', 'Визит'],
+    ]
+    
+    company = models.CharField(max_length=20, choices=COMPANY, default='gals', verbose_name='Компания')
     firstname = models.CharField(max_length=20, verbose_name='Имя')
     lastname = models.CharField(max_length=20, verbose_name='Фамилия')
-    post = models.CharField(max_length=50, verbose_name='Должность')
+    post = models.CharField(max_length=100, verbose_name='Должность')
     start_work = models.TimeField(default='10:30:00', verbose_name='Начало смены')
     end_work = models.TimeField(default='19:30:00', verbose_name='Конец смены')
     card = models.CharField(max_length=13, verbose_name='Карта сотрудника')
@@ -19,6 +28,7 @@ class Employee(models.Model):
         return '%s %s' % (self.lastname, self.firstname)
 
     class Meta:
+	db_table = 'employee'
         ordering = ['lastname']
         verbose_name = 'Сотрудник'
         verbose_name_plural = 'Сотрудники'
@@ -36,6 +46,7 @@ class Tabel(models.Model):
         return '%s' % self.employee
 
     class Meta:
+	db_table = 'tabel'
 	ordering = ['employee']
         verbose_name = 'Табель'
         verbose_name_plural = 'Табели'

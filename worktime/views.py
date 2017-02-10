@@ -14,7 +14,7 @@ from worktime.forms import RegistrationForm, PeriodForm
 import datetime
 from django.utils import timezone
 import openpyxl
-from worktime.functions import time_delta
+from worktime.functions import time_delta, hello_message
 
 
 def custom_login(request):
@@ -32,7 +32,8 @@ def custom_login(request):
 
 def index(request):
     if request.method == 'POST':
-        card = request.POST['card']
+	card = request.POST['card']
+	time = timezone.localtime(timezone.now())
         try:
 	    employee = Employee.objects.get(card=card)
 	except Employee.DoesNotExist:
@@ -43,11 +44,13 @@ def index(request):
 	    tabel.at_work = False
 	    tabel.time_at_work = time_delta(tabel.end_work - tabel.start_work)
 	    tabel.save()
-	    return render(request, 'worktime/bye.html', {'employee': employee})
+	    message = ['До свидания,', 'Всего хорошего,', 'До скорой встречи, ;)', 'До встречи,', 'Разрешите откланяться,']
+	    return render(request, 'worktime/bye.html', {'employee': employee, 'message': message})
 	except Tabel.DoesNotExist:
 	    tabel = Tabel(employee=employee, at_work=True)
 	    tabel.save()
-	    return render(request, 'worktime/hello.html', {'employee': employee})
+	    message = hello_message(time)
+	    return render(request, 'worktime/hello.html', {'employee': employee, 'message': message})
     return render(request, 'worktime/index.html')
 
 
@@ -65,6 +68,14 @@ class EmployeeView(LoginRequiredMixin, ListView):
     model = Employee
     template_name = 'worktime/employee.html'
     context_object_name = 'employee_table'
+
+
+class EmployeeSearchView(LoginRequiredMixin, ListView):
+    template_name = 'worktime/employee.html'
+    context_object_name = 'employee_table'
+    
+    def get_queryset(self):
+	return Employee.objects.filter(lastname__istartswith=self.args[0])
 
 
 @login_required
@@ -113,11 +124,12 @@ class EmployeeDeleteView(LoginRequiredMixin, DeleteView):
     template_name = 'worktime/employee_delete.html'
 
 
+@login_required
 def export_xlsx(request, year, month, day):
     date = datetime.date(int(year), int(month), int(day))
     tabel = Tabel.objects.filter(start_work__contains=date).order_by('employee')
-    excel_data = [[u'Сотрудник', u'Начало смены', u'Конец смены', u'Длительность смены'],
-		  ['', '', '', '']
+    excel_data = [[u'Сотрудник', u'Начало смены', u'Конец смены', u'Длительность смены', 'Дата'],
+		  ['', '', '', '', '']
 		 ]
     for obj in tabel:
 	if obj.end_work:
@@ -127,10 +139,17 @@ def export_xlsx(request, year, month, day):
 	excel_data.append([str(obj.employee),
 			  '{}:{:0>2}'.format(timezone.localtime(obj.start_work).hour, obj.start_work.minute),
 			  end_work,
-			  obj.time_at_work
+			  str(obj.time_at_work),
+			  str(obj.start_work.date())
 			])
     wb = openpyxl.Workbook()
     ws = wb.get_active_sheet()
+    ws.title = u'Табель %s' % date
+    ws.column_dimensions['A'].width = 40
+    ws.column_dimensions['B'].width = 15
+    ws.column_dimensions['C'].width = 15
+    ws.column_dimensions['D'].width = 20
+    ws.column_dimensions['E'].width = 15
     for line in excel_data:
 	ws.append(line)
     response = HttpResponse(content_type='application/ms-excel')

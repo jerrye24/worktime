@@ -1,5 +1,6 @@
 *.pyc
 manage.py
 project0/
+worktime_project/
 static/admin/
 worktime/migrations/
