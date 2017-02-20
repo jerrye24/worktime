@@ -10,6 +10,7 @@
 		{% bootstrap_javascript %}
 		{{ form.media }}
 		<link rel='stylesheet' href="{% static 'worktime/css/style.css' %}">
+		<link rel="shortcut icon" href="{% static 'worktime/img/favicon.png' %}" type="image/png">
 	</head>
 
 	<body>
@@ -47,7 +48,7 @@
 				{% include 'worktime/menu.html' %}
 			    {% endblock %}
 
-			    <div class='col-md-10 col-md-offset-2 content'>
+			    <div class='col-sm-offset-3 col-sm-9 col-md-offset-2 col-md-10 content'>
 				{% block content %}{% endblock %}
 			    </div>
 			</div>
