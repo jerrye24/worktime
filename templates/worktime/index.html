@@ -13,7 +13,7 @@
 	<form action='{% url 'index' %}' method='post'>
 	    <div class='form-group'>
 		{% csrf_token %}
-		<input type='text' class='form-control input-lg' placeholder='Карта сотрудника' name='card'/>
+		<input type='text' class='form-control input-lg' placeholder='Карта сотрудника' name='card' autocomplete='off'>
 	    </div>
 	</form>
     </div>

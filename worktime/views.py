@@ -44,7 +44,7 @@ def index(request):
 	    tabel.at_work = False
 	    tabel.time_at_work = time_delta(tabel.end_work - tabel.start_work)
 	    tabel.save()
-	    message = ['До свидания,', 'Всего хорошего,', 'До скорой встречи, ;)', 'До встречи,', 'Разрешите откланяться,']
+	    message = ['До свидания,', 'Всего хорошего,', 'До скорой встречи, ;)', 'До встречи,']
 	    return render(request, 'worktime/bye.html', {'employee': employee, 'message': message})
 	except Tabel.DoesNotExist:
 	    tabel = Tabel(employee=employee, at_work=True)
