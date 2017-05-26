@@ -1,5 +1,6 @@
 *.pyc
 manage.py
+db.sqlite3
 project0/
 worktime_project/
 static/admin/
