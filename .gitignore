@@ -2,6 +2,9 @@
 manage.py
 db.sqlite3
 project0/
-worktime_project/
+worktime_project/settings.py
+worktime_project/__init__.py
+worktime_project/wsgi.py
 static/admin/
 worktime/migrations/
+.idea/

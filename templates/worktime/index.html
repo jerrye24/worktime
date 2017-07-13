@@ -1,25 +1,43 @@
 {% extends 'worktime/base.html' %}
-{% load bootstrap3 %}
 
 {% block title %}Учет времени{% endblock %}
 
 {% block content %}
 
     <div class='jumbotron col-md-10'>
-	<h1 id='clock'>Clock</h1>
-	<h2>{% now 'l, j E Y' %}</h2>
+	<h1 id='clock'></h1>
+    <h2 id='date'></h2>
 	<br>
 	<br>
 	<form action='{% url 'index' %}' method='post'>
 	    <div class='form-group'>
 		{% csrf_token %}
-		<input type='text' class='form-control input-lg' placeholder='Карта сотрудника' name='card' autocomplete='off'>
+		<input type='text' class='form-control input-lg' placeholder='Карта сотрудника' name='card' autocomplete='off' autofocus>
 	    </div>
 	</form>
     </div>
     
     <script>
-	document.forms[1].elements[1].focus();
+	    function Clock() {
+            var date = new Date();
+            var hours = date.getHours();
+            var minutes = date.getMinutes();
+            var seconds = date.getSeconds();
+            var options = {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                weekday: 'long'
+            };
+            if (hours < 10) hours = '0' + hours;
+            if (minutes < 10) minutes = '0' + minutes;
+            if (seconds < 10) seconds = '0' + seconds;
+            document.getElementById('clock').innerHTML = hours + ':' + minutes + ':' + seconds;
+            document.getElementById('date').innerHTML = date.toLocaleString("ru", options);
+	    }
+	    window.onload = function () {
+	        setInterval(Clock, 1000);
+	    };
     </script>
 
 {% endblock %}

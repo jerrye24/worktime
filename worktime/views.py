@@ -1,16 +1,15 @@
-#coding: utf-8
+# coding: utf-8
 
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from django.core.urlresolvers import reverse_lazy
 from django.contrib.auth import authenticate, login
 from django.views.generic import ListView
 from django.views.generic.dates import DayArchiveView
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic.edit import DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from worktime.models import Employee, Tabel
-from worktime.forms import RegistrationForm, PeriodForm
+from worktime.forms import PeriodForm, EmployeeForm
 import datetime
 from django.utils import timezone
 import openpyxl
@@ -23,34 +22,34 @@ def custom_login(request):
     date = datetime.date.today()
     user = authenticate(username=username, password=password)
     if user is not None:
-	if user.is_active:
-	    login(request, user)
-	    return redirect('tabel', year=date.year, month=date.month, day=date.day)
+        if user.is_active:
+            login(request, user)
+            return redirect('tabel', year=date.year, month=date.month, day=date.day)
     else:
-	return redirect('index')
+        return redirect('index')
 
 
 def index(request):
     if request.method == 'POST':
-	card = request.POST['card']
-	time = timezone.localtime(timezone.now())
+        card = request.POST['card']
+        time = timezone.localtime(timezone.now())
         try:
-	    employee = Employee.objects.get(card=card)
-	except Employee.DoesNotExist:
-	    return render(request, 'worktime/error.html')
-	try:
-	    tabel = Tabel.objects.get(employee=employee, start_work__gte=datetime.date.today(), at_work=True)
-	    tabel.end_work = timezone.now()
-	    tabel.at_work = False
-	    tabel.time_at_work = time_delta(tabel.end_work - tabel.start_work)
-	    tabel.save()
-	    message = ['До свидания,', 'Всего хорошего,', 'До скорой встречи, ;)', 'До встречи,']
-	    return render(request, 'worktime/bye.html', {'employee': employee, 'message': message})
-	except Tabel.DoesNotExist:
-	    tabel = Tabel(employee=employee, at_work=True)
-	    tabel.save()
-	    message = hello_message(time)
-	    return render(request, 'worktime/hello.html', {'employee': employee, 'message': message})
+            employee = Employee.objects.get(card=card)
+        except Employee.DoesNotExist:
+            return render(request, 'worktime/error.html')
+        try:
+            tabel = Tabel.objects.get(employee=employee, start_work__gte=datetime.date.today(), at_work=True)
+            tabel.end_work = timezone.now()
+            tabel.at_work = False
+            tabel.time_at_work = time_delta(tabel.end_work - tabel.start_work)
+            tabel.save()
+            message = ['До свидания,', 'Всего хорошего,', 'До скорой встречи, ;)', 'До встречи,']
+            return render(request, 'worktime/bye.html', {'employee': employee, 'message': message})
+        except Tabel.DoesNotExist:
+            tabel = Tabel(employee=employee, at_work=True)
+            tabel.save()
+            message = hello_message(time)
+            return render(request, 'worktime/hello.html', {'employee': employee, 'message': message})
     return render(request, 'worktime/index.html')
 
 
@@ -73,9 +72,9 @@ class EmployeeView(LoginRequiredMixin, ListView):
 class EmployeeSearchView(LoginRequiredMixin, ListView):
     template_name = 'worktime/employee.html'
     context_object_name = 'employee_table'
-    
+
     def get_queryset(self):
-	return Employee.objects.filter(lastname__istartswith=self.args[0])
+        return Employee.objects.filter(lastname__istartswith=self.args[0])
 
 
 @login_required
@@ -102,21 +101,34 @@ def tabel_period(request, start, end, id):
     end = datetime.datetime(int(end[4:]), int(end[2:4]), int(end[:2]), 23, 59)
     tabel_period = Tabel.objects.filter(employee=id, start_work__range=(start, end))
     employee = Employee.objects.get(id=id)
-    return render(request, 'worktime/tabel_period.html', {'tabel_period': tabel_period, 'start': start, 'end': end, 'employee': employee})
+    return render(request, 'worktime/tabel_period.html',
+                  {'tabel_period': tabel_period, 'start': start, 'end': end, 'employee': employee})
 
 
-class EmployeeCreateView(LoginRequiredMixin, CreateView):
-    model = Employee
-    fields = ['company', 'lastname', 'firstname', 'post', 'start_work', 'end_work', 'card']
-    success_url = '/employee/'
-    template_name = 'worktime/employee_create.html'
+@login_required
+def employee_create_view(request):
+    if request.method == 'POST':
+        form = EmployeeForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('employee')
+    else:
+        form = EmployeeForm()
+        return render(request, 'worktime/employee_create.html', {'form': form})
 
 
-class EmployeeUpdateView(LoginRequiredMixin, UpdateView):
-    model = Employee
-    fields = ['company', 'lastname', 'firstname', 'post', 'start_work', 'end_work', 'card']
-    success_url = '/employee/'
-    template_name = 'worktime/employee_update.html'
+@login_required
+def employee_update_view(request, pk):
+    employee = Employee.objects.get(id=pk)
+    if request.method == 'POST':
+        form = EmployeeForm(request.POST)
+        if form.is_valid():
+            form = EmployeeForm(request.POST, instance=employee)
+            form.save()
+            return redirect('employee')
+    else:
+        form = EmployeeForm(instance=employee)
+        return render(request, 'worktime/employee_update.html', {'form': form})
 
 
 class EmployeeDeleteView(LoginRequiredMixin, DeleteView):
@@ -129,19 +141,19 @@ def export_xlsx(request, year, month, day):
     date = datetime.date(int(year), int(month), int(day))
     tabel = Tabel.objects.filter(start_work__contains=date).order_by('employee')
     excel_data = [[u'Сотрудник', u'Начало смены', u'Конец смены', u'Длительность смены', 'Дата'],
-		  ['', '', '', '', '']
-		 ]
+                  ['', '', '', '', '']
+                  ]
     for obj in tabel:
-	if obj.end_work:
-	    end_work = '{}:{:0>2}'.format(timezone.localtime(obj.end_work).hour, obj.end_work.minute)
-	else:
-	    end_work = ''
-	excel_data.append([str(obj.employee),
-			  '{}:{:0>2}'.format(timezone.localtime(obj.start_work).hour, obj.start_work.minute),
-			  end_work,
-			  str(obj.time_at_work),
-			  str(obj.start_work.date())
-			])
+        if obj.end_work:
+            end_work = '{}:{:0>2}'.format(timezone.localtime(obj.end_work).hour, obj.end_work.minute)
+        else:
+            end_work = ''
+        excel_data.append([str(obj.employee),
+                           '{}:{:0>2}'.format(timezone.localtime(obj.start_work).hour, obj.start_work.minute),
+                           end_work,
+                           str(obj.time_at_work),
+                           str(obj.start_work.date())
+                           ])
     wb = openpyxl.Workbook()
     ws = wb.get_active_sheet()
     ws.title = u'Табель %s' % date
@@ -151,9 +163,9 @@ def export_xlsx(request, year, month, day):
     ws.column_dimensions['D'].width = 20
     ws.column_dimensions['E'].width = 15
     for line in excel_data:
-	ws.append(line)
+        ws.append(line)
     response = HttpResponse(content_type='application/ms-excel')
     response['Content-Disposition'] = 'attachment; filename=%s.xlsx' % date
-    
+
     wb.save(response)
     return response

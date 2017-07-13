@@ -1,5 +1,4 @@
 {% extends 'worktime/base.html' %}
-{% load bootstrap3 %}
 
 {% block title %}Выбор периода и сотрудника{% endblock %}
 
@@ -9,11 +8,41 @@
 			<h3>Выбрать сотрудника и период</h3>
 			<form action="" method="post">
 				{% csrf_token %}
-			        {% bootstrap_form form %}
-			        {% buttons %}
-					<button type="submit" class="btn btn-primary">Показать</button>
-			        {% endbuttons %}
+                {% for field in form %}
+                    <div class="form-group">
+                        {{ field.label_tag }}
+                        {{ field }}
+                    </div>
+                {% endfor %}
+                <button type="submit" class="btn btn-primary">Показать</button>
 			</form>
 		</div>
-        </div>			
+    </div>
+
+    <script>
+        $("#id_period").datepicker({
+            dateFormat: 'ddmmyy',
+            firstDay: 1,
+            dayNamesMin: [ 'Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+            monthNames: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
+            onSelect: function( selectedDate ) {
+                if(!$(this).data().datepicker.first){
+                    $(this).data().datepicker.inline = true;
+                    $(this).data().datepicker.first = selectedDate;
+                }else{
+                    if(selectedDate > $(this).data().datepicker.first){
+                        $(this).val($(this).data().datepicker.first+"-"+selectedDate);
+                    }else{
+                        $(this).val(selectedDate+"-"+$(this).data().datepicker.first);
+                    }
+                    $(this).data().datepicker.inline = false;
+                }
+            },
+            onClose:function(){
+                delete $(this).data().datepicker.first;
+                $(this).data().datepicker.inline = false;
+            }
+        });
+    </script>
+
 {% endblock %}

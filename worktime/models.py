@@ -1,4 +1,4 @@
-#coding: utf8
+# coding: utf8
 from __future__ import unicode_literals
 
 from django.db import models
@@ -8,15 +8,14 @@ from django.utils import timezone
 
 @python_2_unicode_compatible
 class Employee(models.Model):
-    
     COMPANY = [
-	['Галс', 'Галс'],
-	['Водомат', 'Водомат'],
-	['Водомат-сервис', 'Водомат-сервис'],
-	['ХАВ', 'ХАВ'],
-	['Визит', 'Визит'],
+        ['Галс', 'Галс'],
+        ['Водомат', 'Водомат'],
+        ['Водомат-сервис', 'Водомат-сервис'],
+        ['ХАВ', 'ХАВ'],
+        ['Визит', 'Визит'],
     ]
-    
+
     company = models.CharField(max_length=20, choices=COMPANY, default='gals', verbose_name='Компания')
     firstname = models.CharField(max_length=20, verbose_name='Имя')
     lastname = models.CharField(max_length=20, verbose_name='Фамилия')
@@ -29,7 +28,7 @@ class Employee(models.Model):
         return '%s %s' % (self.lastname, self.firstname)
 
     class Meta:
-	db_table = 'employee'
+        db_table = 'employee'
         ordering = ['lastname']
         verbose_name = 'Сотрудник'
         verbose_name_plural = 'Сотрудники'
@@ -47,7 +46,7 @@ class Tabel(models.Model):
         return '%s' % self.employee
 
     class Meta:
-	db_table = 'tabel'
-	ordering = ['employee']
+        db_table = 'tabel'
+        ordering = ['employee']
         verbose_name = 'Табель'
         verbose_name_plural = 'Табели'
