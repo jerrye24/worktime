@@ -2,8 +2,8 @@
 from __future__ import unicode_literals
 
 from django.db import models
+from django.contrib.auth.models import User
 from django.utils.encoding import python_2_unicode_compatible
-from django.utils import timezone
 
 
 @python_2_unicode_compatible
@@ -16,7 +16,7 @@ class Employee(models.Model):
         ['Визит', 'Визит'],
     ]
 
-    company = models.CharField(max_length=20, choices=COMPANY, default='gals', verbose_name='Компания')
+    company = models.CharField(max_length=20, choices=COMPANY, default='Галс', verbose_name='Компания')
     firstname = models.CharField(max_length=20, verbose_name='Имя')
     lastname = models.CharField(max_length=20, verbose_name='Фамилия')
     post = models.CharField(max_length=100, verbose_name='Должность')

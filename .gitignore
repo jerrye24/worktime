@@ -8,4 +8,5 @@ worktime_project/__init__.py
 worktime_project/wsgi.py
 static/admin/
 worktime/migrations/
+users/migrations/
 .idea/

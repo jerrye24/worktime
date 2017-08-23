@@ -11,6 +11,7 @@
                 {% for field in form %}
                     <div class="form-group">
                         {{ field.label_tag }}
+                        <span class="text-danger">{{ field.errors }}</span>
                         {{ field }}
                     </div>
                 {% endfor %}
@@ -44,5 +45,7 @@
             }
         });
     </script>
+
+    {% block static %}{% endblock %}
 
 {% endblock %}

@@ -3,17 +3,16 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login
-from django.views.generic import ListView
 from django.views.generic.dates import DayArchiveView
 from django.views.generic.edit import DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
-from worktime.models import Employee, Tabel
-from worktime.forms import PeriodForm, EmployeeForm
+from .models import Employee, Tabel
+from .forms import PeriodForm, EmployeeCreateForm, EmployeeUpdateForm
 import datetime
 from django.utils import timezone
 import openpyxl
-from worktime.functions import time_delta, hello_message
+from .functions import time_delta, hello_message
 
 
 def custom_login(request):
@@ -37,6 +36,8 @@ def index(request):
             employee = Employee.objects.get(card=card)
         except Employee.DoesNotExist:
             return render(request, 'worktime/error.html')
+        except Employee.MultipleObjectsReturned:
+            return render(request, 'worktime/error.html', {'card': card})
         try:
             tabel = Tabel.objects.get(employee=employee, start_work__gte=datetime.date.today(), at_work=True)
             tabel.end_work = timezone.now()
@@ -54,7 +55,6 @@ def index(request):
 
 
 class TabelView(LoginRequiredMixin, DayArchiveView):
-    model = Tabel
     date_field = 'start_work'
     template_name = 'worktime/tabel.html'
     context_object_name = 'tabel_table'
@@ -62,19 +62,17 @@ class TabelView(LoginRequiredMixin, DayArchiveView):
     allow_future = True
     month_format = '%m'
 
-
-class EmployeeView(LoginRequiredMixin, ListView):
-    model = Employee
-    template_name = 'worktime/employee.html'
-    context_object_name = 'employee_table'
-
-
-class EmployeeSearchView(LoginRequiredMixin, ListView):
-    template_name = 'worktime/employee.html'
-    context_object_name = 'employee_table'
+    def get_context_data(self, **kwargs):
+        context = super(TabelView, self).get_context_data(**kwargs)
+        context['company_list'] = [i[0] for i in Employee.COMPANY]
+        return context
 
     def get_queryset(self):
-        return Employee.objects.filter(lastname__istartswith=self.args[0])
+        company = self.request.GET.get('company')
+        if company:
+            return Tabel.objects.filter(employee__company=company)
+        else:
+            return Tabel.objects.all()
 
 
 @login_required
@@ -83,16 +81,10 @@ def tabel_period_form(request):
         form = PeriodForm(request.POST)
         if form.is_valid():
             data = form.cleaned_data
-            period = data['period']
-            start = period[0]
-            try:
-                end = period[1]
-            except ImportError:
-                end = start
-            return redirect('tabel_period', start=start, end=end, id=data['employee'].id)
+            return redirect('tabel_period', start=data['period'][0], end=data['period'][1], id=data['employee'].id)
     else:
         form = PeriodForm()
-    return render(request, 'worktime/period_form.html', {'form': form})
+    return render(request, 'worktime/tabel_form.html', {'form': form})
 
 
 @login_required
@@ -106,14 +98,30 @@ def tabel_period(request, start, end, id):
 
 
 @login_required
+def employee_view(request):
+    company_list = [i[0] for i in Employee.COMPANY]
+    company = request.GET.get('company')
+    lastname = request.GET.get('lastname')
+    if company:
+        employee_table = Employee.objects.filter(company=company)
+    elif lastname:
+        employee_table = Employee.objects.filter(lastname__istartswith=lastname)
+    else:
+        employee_table = Employee.objects.all()
+    return render(request, 'worktime/employee.html', {'employee_table': employee_table, 'company_list': company_list})
+
+
+@login_required
 def employee_create_view(request):
     if request.method == 'POST':
-        form = EmployeeForm(request.POST)
+        form = EmployeeCreateForm(request.POST)
         if form.is_valid():
             form.save()
             return redirect('employee')
+        else:
+            return render(request, 'worktime/employee_create.html', {'form': form})
     else:
-        form = EmployeeForm()
+        form = EmployeeCreateForm()
         return render(request, 'worktime/employee_create.html', {'form': form})
 
 
@@ -121,13 +129,15 @@ def employee_create_view(request):
 def employee_update_view(request, pk):
     employee = Employee.objects.get(id=pk)
     if request.method == 'POST':
-        form = EmployeeForm(request.POST)
+        form = EmployeeUpdateForm(request.POST)
         if form.is_valid():
-            form = EmployeeForm(request.POST, instance=employee)
+            form = EmployeeUpdateForm(request.POST, instance=employee)
             form.save()
             return redirect('employee')
+        else:
+            return render(request, 'worktime/employee_update.html', {'form': form})
     else:
-        form = EmployeeForm(instance=employee)
+        form = EmployeeUpdateForm(instance=employee)
         return render(request, 'worktime/employee_update.html', {'form': form})
 
 

@@ -1,43 +1,50 @@
 {% extends 'worktime/base.html' %}
+{% load staticfiles %}
 
 {% block title %}Табель{% endblock %}
 
 {% block content %}
 
-<nav>
-    <ul class='pager'>
-	<li class='previous'><a href='{% url 'tabel' previous_day.year previous_day.month previous_day.day %}'>Предыдущий день</a></li>
-	<li><a href='{% url 'export_xlsx' day.year day.month day.day %}'>
-	    <span class='glyphicon glyphicon-download'></span>  Табель за {{ day }}
-	</a></li>
-	<li class='next'><a href='{% url 'tabel' next_day.year next_day.month next_day.day %}'>Следующий день</a></li>
-    </ul>
-</nav>
+    <nav>
+        <ul class='pager'>
+        <li class='previous'><a href='{% url 'tabel' previous_day.year previous_day.month previous_day.day %}'>Предыдущий день</a></li>
+        <li><a href='{% url 'export_xlsx' day.year day.month day.day %}'>
+            <span class='glyphicon glyphicon-download'></span>  Табель за {{ day }}
+        </a></li>
+        <li class='next'><a href='{% url 'tabel' next_day.year next_day.month next_day.day %}'>Следующий день</a></li>
+        </ul>
+    </nav>
 
-<table class='table table-striped'>
-	<thead>
-		<tr>
-			<th></th>
-			<th>Фамилия</th>
-			<th>Имя</th>
-			<th>Начало смены</th>
-			<th>Конец смены</th>
-			<th>Длительность смены</th>
-		</tr>
-	</thead>
+    {% block alphabet %}
+        {% include 'worktime/alphabet.html' %}
+    {% endblock %}
 
-	<tbody>
-		{% for employee in tabel_table %}
-		<tr>
-			<td>{{ forloop.counter }}</td>
-			<td>{{ employee.employee.lastname }}</td>
-			<td>{{ employee.employee.firstname }}</td>
-			<td>{{ employee.start_work|time:'H:i' }}</td>
-			<td>{% if employee.end_work %}{{ employee.end_work|time:'H:i' }}{% endif %}</td>
-			<td>{% if employee.time_at_work %}{{ employee.time_at_work }}{% endif %}</td>
-		</tr>
-		{% endfor %}
+    <table class='table table-striped tablesorter'>
+        <thead>
+            <tr>
+                <th></th>
+                <th>Фамилия</th>
+                <th>Имя</th>
+                <th>Начало смены</th>
+                <th>Конец смены</th>
+                <th>Длительность смены</th>
+            </tr>
+        </thead>
 
-</table>
+        <tbody>
+            {% for employee in tabel_table %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ employee.employee.lastname }}</td>
+                <td>{{ employee.employee.firstname }}</td>
+                <td>{{ employee.start_work|time:'H:i' }}</td>
+                <td>{% if employee.end_work %}{{ employee.end_work|time:'H:i' }}{% endif %}</td>
+                <td>{% if employee.time_at_work %}{{ employee.time_at_work }}{% endif %}</td>
+            </tr>
+            {% endfor %}
+
+    </table>
+
+    <script src="{% static 'worktime/js/tablesorter.js' %}"></script>
 
 {% endblock %}

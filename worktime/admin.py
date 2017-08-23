@@ -1,5 +1,5 @@
 from django.contrib import admin
-from worktime.models import Employee, Tabel
+from .models import Employee, Tabel
 
 
 class AdminTabel(admin.ModelAdmin):

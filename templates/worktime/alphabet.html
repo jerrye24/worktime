@@ -1,34 +1,30 @@
 {% block alphabet %}
-    <div class="btn-toolbar">
-        <div class="btn-group">
-            <a href="{% url 'search' 'А' %}" class="btn btn-default">А</a>
-            <a href="{% url 'search' 'Б' %}" class="btn btn-default">Б</a>
-            <a href="{% url 'search' 'В' %}" class="btn btn-default">В</a>
-            <a href="{% url 'search' 'Г' %}" class="btn btn-default">Г</a>
-            <a href="{% url 'search' 'Д' %}" class="btn btn-default">Д</a>
-            <a href="{% url 'search' 'Е' %}" class="btn btn-default">Е</a>
-            <a href="{% url 'search' 'Ж' %}" class="btn btn-default">Ж</a>
-            <a href="{% url 'search' 'З' %}" class="btn btn-default">З</a>
-            <a href="{% url 'search' 'И' %}" class="btn btn-default">И</a>
-            <a href="{% url 'search' 'К' %}" class="btn btn-default">К</a>
-            <a href="{% url 'search' 'Л' %}" class="btn btn-default">Л</a>
-            <a href="{% url 'search' 'М' %}" class="btn btn-default">М</a>
-            <a href="{% url 'search' 'Н' %}" class="btn btn-default">Н</a>
-            <a href="{% url 'search' 'О' %}" class="btn btn-default">О</a>
-            <a href="{% url 'search' 'П' %}" class="btn btn-default">П</a>
-            <a href="{% url 'search' 'Р' %}" class="btn btn-default">Р</a>
-            <a href="{% url 'search' 'С' %}" class="btn btn-default">С</a>
-            <a href="{% url 'search' 'Т' %}" class="btn btn-default">Т</a>
-            <a href="{% url 'search' 'У' %}" class="btn btn-default">У</a>
-            <a href="{% url 'search' 'Ф' %}" class="btn btn-default">Ф</a>
-            <a href="{% url 'search' 'Х' %}" class="btn btn-default">Х</a>
-            <a href="{% url 'search' 'Ц' %}" class="btn btn-default">Ц</a>
-            <a href="{% url 'search' 'Ч' %}" class="btn btn-default">Ч</a>
-            <a href="{% url 'search' 'Ш' %}" class="btn btn-default">Ш</a>
-            <a href="{% url 'search' 'Щ' %}" class="btn btn-default">Щ</a>
-            <a href="{% url 'search' 'Э' %}" class="btn btn-default">Э</a>
-            <a href="{% url 'search' 'Ю' %}" class="btn btn-default">Ю</a>
-            <a href="{% url 'search' 'Я' %}" class="btn btn-default">Я</a>
+
+    {% with letters='АБВГДЕЖЗИКЛМНОПРСТУФХЦЧШЩЭЮЯ' %}
+
+        <div class="btn-toolbar">
+        {% if 'tabel' not in request.path %}
+            <div class="btn-group">
+            {% for i in letters %}
+                <a href="?lastname={{ i }}" class="btn btn-default">{{ i }}</a>
+            {% endfor %}
+            </div>
+        {% endif %}
+
+            <div class="btn-group dropdown">
+                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Выбрать предприятие <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    {% for i in company_list %}
+                        <li><a href="?company={{ i }}">{{ i }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
-    </div>
+
+    {% endwith %}
+
+    <br>
+
 {% endblock %}
