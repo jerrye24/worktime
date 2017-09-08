@@ -30,8 +30,7 @@ urlpatterns = [
     url(r'^employee/$', employee_view, name='employee'),
     url(r'^employee_create/$', employee_create_view, name='employee_create'),
     url(r'^employee_update/(?P<pk>\d+)/$', employee_update_view, name='employee_update'),
-    url(r'^employee_delete/(?P<pk>\d+)/$', EmployeeDeleteView.as_view(success_url='/employee/'),
-        name='employee_delete'),
+    url(r'^employee_delete/(?P<pk>\d+)/$', EmployeeDeleteView.as_view(success_url='/employee/'), name='employee_delete'),
     url(r'^export_xlsx/(?P<year>\d+)/(?P<month>\d+)/(?P<day>\d+)/$', export_xlsx, name='export_xlsx'),
 ]
 

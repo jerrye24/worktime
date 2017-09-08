@@ -3,6 +3,12 @@
 {% block title %}Выбор периода и сотрудника{% endblock %}
 
 {% block content %}
+
+    <ul class="nav nav-tabs">
+        <li role="presentation"><a href="{% url 'tabel' current_year current_month current_day %}"> Табель за сутки</a></li>
+        <li role="presentation" class="active"><a href="{% url 'tabel_period_form' %}">Табель за период</a></li>
+    </ul>
+
 	<div class="row">
 		<div class="col-md-offset-4 col-lg-offset-4 col-md-4 col-lg-4">
 			<h3>Выбрать сотрудника и период</h3>

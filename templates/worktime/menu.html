@@ -1,9 +1,5 @@
 {% block menu %}
 
-{% now "Y" as current_year %}
-{% now "m" as current_month %}
-{% now "d" as current_day %}
-
 {% if user.is_authenticated %}
     <div class='col-sm-3 col-md-2 sidebar'>
         <ul class='nav nav-sidebar'>
@@ -12,16 +8,16 @@
                     <span class='glyphicon glyphicon-home'></span>  Начальная страница
                 </a>
             </li>
-            <li class={% if 'tabel' in request.path and not 'tabel_period' in request.path %}'active'{% endif %}>
-                <a href='{% url 'tabel' year=current_year month=current_month day=current_day %}'>
-                    <span class='glyphicon glyphicon-calendar'></span>  Табель за сутки
+            <li class={% if 'tabel' in request.path %}'active'{% endif %}>
+                <a href='{% url 'tabel' current_year current_month current_day %}'>
+                    <span class='glyphicon glyphicon-calendar'></span>  Табель
                 </a>
             </li>
-            <li class={% if 'tabel_period' in request.path %}'active'{% endif %}>
-                <a href='{% url 'tabel_period_form' %}'>
-                    <span class='glyphicon glyphicon-calendar'></span>  Табель за период
-                </a>
-            </li>
+{#            <li class={% if 'tabel_period' in request.path %}'active'{% endif %}>#}
+{#                <a href='{% url 'tabel_period_form' %}'>#}
+{#                    <span class='glyphicon glyphicon-calendar'></span>  Табель за период#}
+{#                </a>#}
+{#            </li>#}
             <li class={% if 'employee' in request.path and not 'employee_create' in request.path %}'active'{% endif %}>
                 <a href='{% url 'employee' %}'>
                     <span class='glyphicon glyphicon-user'></span>  Сотрудники

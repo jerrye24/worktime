@@ -21,6 +21,7 @@ class AddCssClass(forms.Form):
 class PeriodForm(AddCssClass):
 
     employee = forms.ModelChoiceField(queryset=Employee.objects.all().only('id', 'lastname'), label=u'Сотрудник')
+    # employee = forms.CharField(widget=DatepickerWidget, label=u'Сотрудник')
     period = forms.CharField(widget=DatepickerWidget, label=u'Период')
 
     def clean_period(self):
