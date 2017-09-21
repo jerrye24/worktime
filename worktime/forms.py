@@ -3,7 +3,7 @@ from django import forms
 from worktime.models import Employee
 
 
-class DatepickerWidget(forms.TextInput):
+class jQueryUIWidget(forms.TextInput):
 
     class Media:
         css = {'all': ('//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css',)}
@@ -20,9 +20,10 @@ class AddCssClass(forms.Form):
 
 class PeriodForm(AddCssClass):
 
-    employee = forms.ModelChoiceField(queryset=Employee.objects.all().only('id', 'lastname'), label=u'Сотрудник')
-    # employee = forms.CharField(widget=DatepickerWidget, label=u'Сотрудник')
-    period = forms.CharField(widget=DatepickerWidget, label=u'Период')
+    # employee = forms.ModelChoiceField(queryset=Employee.objects.all().only('id', 'lastname'), label=u'Сотрудник')
+    employee_label = forms.CharField(widget=jQueryUIWidget(attrs={'autofocus': 1}), label=u'Введите фамилию')
+    employee = forms.IntegerField(widget=forms.HiddenInput)
+    period = forms.CharField(label=u'Выберите период')
 
     def clean_period(self):
         data = self.cleaned_data['period']

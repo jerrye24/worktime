@@ -26,6 +26,7 @@ urlpatterns = [
     url(r'^logout_then_login/$', logout_then_login, name='logout_then_login'),
     url(r'^tabel/(?P<year>\d+)/(?P<month>\d+)/(?P<day>\d+)/$', TabelView.as_view(), name='tabel'),
     url(r'^tabel_period_form/$', tabel_period_form, name='tabel_period_form'),
+    url(r'tabel_json/$', tabel_json, name='tabel_json'),
     url(r'^tabel_period/(?P<start>\d+)/(?P<end>\d+)/(?P<id>\d+)/$', tabel_period, name='tabel_period'),
     url(r'^employee/$', employee_view, name='employee'),
     url(r'^employee_create/$', employee_create_view, name='employee_create'),

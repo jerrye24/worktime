@@ -1,7 +1,7 @@
 # coding: utf-8
 
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib.auth import authenticate, login
 from django.views.generic.dates import DayArchiveView
 from django.views.generic.edit import DeleteView
@@ -81,18 +81,29 @@ def tabel_period_form(request):
         form = PeriodForm(request.POST)
         if form.is_valid():
             data = form.cleaned_data
-            return redirect('tabel_period', start=data['period'][0], end=data['period'][1], id=data['employee'].id)
+            return redirect('tabel_period', start=data['period'][0], end=data['period'][1], id=data['employee'])
     else:
         form = PeriodForm()
     return render(request, 'worktime/tabel_form.html', {'form': form})
 
 
 @login_required
+def tabel_json(request):
+    term = request.GET['term'].capitalize()
+    data = Employee.objects.filter(lastname__startswith=term)
+    employees = []
+    for employee in data:
+        employee = {'value': str(employee), 'id': employee.id}
+        employees.append(employee)
+    return JsonResponse(employees, safe=False)
+
+
+@login_required
 def tabel_period(request, start, end, id):
     start = datetime.date(int(start[4:]), int(start[2:4]), int(start[:2]))
     end = datetime.datetime(int(end[4:]), int(end[2:4]), int(end[:2]), 23, 59)
-    tabel_period = Tabel.objects.filter(employee=id, start_work__range=(start, end))
     employee = Employee.objects.get(id=id)
+    tabel_period = Tabel.objects.filter(employee=employee, start_work__range=(start, end))
     return render(request, 'worktime/tabel_period.html',
                   {'tabel_period': tabel_period, 'start': start, 'end': end, 'employee': employee})
 
