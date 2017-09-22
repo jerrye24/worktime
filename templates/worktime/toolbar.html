@@ -23,17 +23,37 @@
             </div>
 
         {% if 'tabel' in request.path %}
-            <div class="btn-group pull-right">
-                <a class="btn btn-primary" href='{% url 'tabel' previous_day.year previous_day.month previous_day.day %}'>
-                    <span class="glyphicon glyphicon-chevron-left"></span> Предыдущий день
-                </a>
-                <a class="btn btn-info" href='{% url 'export_xlsx' day.year day.month day.day %}'>
-                    <span class='glyphicon glyphicon-download'></span>  Табель за {{ day }}
-                </a>
-                <a class="btn btn-primary" href='{% url 'tabel' next_day.year next_day.month next_day.day %}'>
-                    Следующий день <span class="glyphicon glyphicon-chevron-right"></span>
-                </a>
-            </div>
+
+            {% if request.GET.company %}
+
+                <div class="btn-group pull-right">
+                    <a class="btn btn-primary" href='{% url 'tabel' previous_day.year previous_day.month previous_day.day %}?company={{ request.GET.company }}'>
+                        <span class="glyphicon glyphicon-chevron-left"></span> Предыдущий день
+                    </a>
+                    <a class="btn btn-info" href='{% url 'export_xlsx' day.year day.month day.day %}'>
+                        <span class='glyphicon glyphicon-download'></span>  Табель за {{ day }}
+                    </a>
+                    <a class="btn btn-primary" href='{% url 'tabel' next_day.year next_day.month next_day.day %}?company={{ request.GET.company }}'>
+                        Следующий день <span class="glyphicon glyphicon-chevron-right"></span>
+                    </a>
+                </div>
+
+            {% else %}
+
+                <div class="btn-group pull-right">
+                    <a class="btn btn-primary" href='{% url 'tabel' previous_day.year previous_day.month previous_day.day %}'>
+                        <span class="glyphicon glyphicon-chevron-left"></span> Предыдущий день
+                    </a>
+                    <a class="btn btn-info" href='{% url 'export_xlsx' day.year day.month day.day %}'>
+                        <span class='glyphicon glyphicon-download'></span>  Табель за {{ day }}
+                    </a>
+                    <a class="btn btn-primary" href='{% url 'tabel' next_day.year next_day.month next_day.day %}'>
+                        Следующий день <span class="glyphicon glyphicon-chevron-right"></span>
+                    </a>
+                </div>
+
+            {% endif %}
+
         {% endif %}
 
         </div>
