@@ -8,6 +8,7 @@ from django.views.generic.edit import DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from .models import Employee, Tabel
+from .models import COMPANY as all_company
 from .forms import PeriodForm, EmployeeCreateForm, EmployeeUpdateForm
 import datetime
 from django.utils import timezone
@@ -64,15 +65,19 @@ class TabelView(LoginRequiredMixin, DayArchiveView):
 
     def get_context_data(self, **kwargs):
         context = super(TabelView, self).get_context_data(**kwargs)
-        context['company_list'] = [i[0] for i in Employee.COMPANY]
+        context['company_list'] = [i[0] for i in all_company]
         return context
 
     def get_queryset(self):
-        company = self.request.GET.get('company')
-        if company:
-            return Tabel.objects.filter(employee__company=company)
+        company_permission = self.request.user.company_permission
+        if company_permission == u'Галс':
+            company = self.request.GET.get('company')
+            if company:
+                return Tabel.objects.filter(employee__company=company)
+            else:
+                return Tabel.objects.all()
         else:
-            return Tabel.objects.all()
+            return Tabel.objects.filter(employee__company=company_permission)
 
 
 @login_required
@@ -110,15 +115,23 @@ def tabel_period(request, start, end, id):
 
 @login_required
 def employee_view(request):
-    company_list = [i[0] for i in Employee.COMPANY]
+    company_list = [i[0] for i in all_company]
     company = request.GET.get('company')
     lastname = request.GET.get('lastname')
-    if company:
-        employee_table = Employee.objects.filter(company=company)
-    elif lastname:
-        employee_table = Employee.objects.filter(lastname__istartswith=lastname)
+    company_permission = request.user.company_permission
+    if company_permission == u'Галс':
+        if company:
+            employee_table = Employee.objects.filter(company=company)
+        elif lastname:
+            employee_table = Employee.objects.filter(lastname__istartswith=lastname)
+        else:
+            employee_table = Employee.objects.all()
     else:
-        employee_table = Employee.objects.all()
+        if lastname:
+            employee_table = Employee.objects.filter(company=company_permission).filter(lastname__istartswith=lastname)
+        else:
+            employee_table = Employee.objects.filter(company=company_permission)
+
     return render(request, 'worktime/employee.html', {'employee_table': employee_table, 'company_list': company_list})
 
 

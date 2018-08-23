@@ -2,17 +2,18 @@
 from __future__ import unicode_literals
 
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
 
-
-class Employee(models.Model):
-    COMPANY = [
+COMPANY = [
         ['Галс', 'Галс'],
         ['Водомат', 'Водомат'],
         ['Водомат-сервис', 'Водомат-сервис'],
         ['ХАВ', 'ХАВ'],
         ['Визит', 'Визит'],
     ]
+
+
+class Employee(models.Model):
 
     company = models.CharField(max_length=20, choices=COMPANY, default='Галс', verbose_name='Компания')
     firstname = models.CharField(max_length=20, verbose_name='Имя')
@@ -47,3 +48,7 @@ class Tabel(models.Model):
         ordering = ['employee']
         verbose_name = 'Табель'
         verbose_name_plural = 'Табели'
+
+
+class CustomUser(AbstractUser):
+    company_permission = models.CharField(max_length=20, choices=COMPANY, default='Галс', verbose_name='Разрешенные компании')

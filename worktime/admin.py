@@ -1,5 +1,7 @@
+# coding=utf-8
 from django.contrib import admin
-from .models import Employee, Tabel
+from django.contrib.auth.admin import UserAdmin
+from .models import Employee, Tabel, CustomUser
 
 
 class AdminTabel(admin.ModelAdmin):
@@ -8,6 +10,13 @@ class AdminTabel(admin.ModelAdmin):
     ordering = ('-start_work', )
 
 
-admin.site.register(Employee)
+class AdminCustomUser(UserAdmin):
+    fieldsets = UserAdmin.fieldsets + (
+        ('Разрешенные компании', {'fields': ('company_permission', )}),
+    )
+
+
+admin.site.register(Employee, )
 admin.site.register(Tabel, AdminTabel)
+admin.site.register(CustomUser, AdminCustomUser)
 
